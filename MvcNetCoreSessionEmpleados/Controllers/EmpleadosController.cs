@@ -12,7 +12,53 @@ namespace MvcNetCoreSessionEmpleados.Controllers
         {
             this.repo = repo;
         }
-
+        //TERCERA VERSION
+        public async Task<IActionResult> SessionEmpleadosOK
+            (int? idEmpleado)
+        {
+            if (idEmpleado != null)
+            {
+                //  ALMACENAREMOS LO MINIMO QUE PODAMOS
+                List<int> idsEmpleados;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") == null)
+                {
+                    //  NO EXISTE Y CREAMOS LA COLECCION
+                    idsEmpleados = new List<int>();
+                }
+                else
+                {
+                    //  EXISTE Y RECUERAMOS LA COLECCION
+                    idsEmpleados =
+                        HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                idsEmpleados.Add(idEmpleado.Value);
+                //  REFRESCAMOS LOS DATOS DE SESSION
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                ViewData["MENSAJE"] = "Empleados almacenados: " + idsEmpleados.Count();
+            }
+            List<Empleado> empleados =
+                await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+        public async Task<IActionResult> EmpleadosAlmacenadosOK()
+        {
+            //  DEBEMOS RECUPERAR LOS IDS DE EMPLEADOS QUE TENGAMOS
+            //  EN SESSION
+            List<int> idsEmpleados =
+                HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados almacenados en Session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
+                return View(empleados);
+            }
+        }
+        
+        //SEGUNDA VERSION
         public async Task<IActionResult> SessionEmpleados
             (int? idEmpleado)
         {
@@ -51,7 +97,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
         {
             return View();
         }
-
+        //PRIMERA VERSION
         public async Task<IActionResult> SessionSalarios
             (int? salario)
         {
