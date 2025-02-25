@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MvcNetCoreSessionEmpleados.Data;
 using MvcNetCoreSessionEmpleados.Models;
 
@@ -32,6 +33,22 @@ namespace MvcNetCoreSessionEmpleados.Repositories
             var consulta = from datos in this.context.Empleados
                            //   ES UNA CONSULTA CON UN IN
                            where ids.Contains(datos.IdEmpleado)
+                           select datos;
+            if (consulta.Count() == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return await consulta.ToListAsync();
+            }
+        }
+        //CUARTA VERSION
+        public async Task<List<Empleado>> GetEmpleadosNotSessionAsync
+            (List<int> ids)
+        {
+            var consulta = from datos in this.context.Empleados
+                           where !ids.Contains(datos.IdEmpleado)
                            select datos;
             if (consulta.Count() == 0)
             {
