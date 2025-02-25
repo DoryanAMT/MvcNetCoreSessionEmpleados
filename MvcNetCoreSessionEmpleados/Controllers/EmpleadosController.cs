@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 using MvcNetCoreSessionEmpleados.Extensions;
 using MvcNetCoreSessionEmpleados.Models;
 using MvcNetCoreSessionEmpleados.Repositories;
@@ -48,7 +49,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
             //  EN SESSION
             idsEmpleados =
                 HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
-            if (idsEmpleados == null)
+            if (idsEmpleados.IsNullOrEmpty())
             {
                 ViewData["MENSAJE"] = "No existen empleados almacenados en Session";
                 return View();
@@ -60,6 +61,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                     idsEmpleados.Remove(idEmpleado.Value);
                     HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
                 }
+                ViewData["MENSAJE"] = "No existen empleados almacenados en Session";
                 List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
                 return View(empleados);
             }
