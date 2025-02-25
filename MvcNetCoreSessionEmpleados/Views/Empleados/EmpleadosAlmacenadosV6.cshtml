@@ -8,8 +8,8 @@
 
 <p>
     <a asp-controller="Empleados"
-       asp-action="SessionEmpleadosV4">
-        Volver a almacenar empleados V4
+       asp-action="SessionEmpleadosV6">
+        Volver a almacenar empleados V6
     </a>
 </p>
 @if (Model != null)
@@ -29,6 +29,7 @@
                 <th>
                     Departamento
                 </th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -46,6 +47,14 @@
                     </td>
                     <td>
                         @item.IdDepartamento
+                    </td>
+                    <td>
+                        <a class="btn-warning"
+                        asp-controller="Empleados"
+                           asp-action="EmpleadosAlmacenadosV6"
+                           asp-route-idEmpleado=@item.IdEmpleado>
+                           Borrar
+                        </a>
                     </td>
                 </tr>
             }

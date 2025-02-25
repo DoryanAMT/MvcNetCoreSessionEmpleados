@@ -12,6 +12,104 @@ namespace MvcNetCoreSessionEmpleados.Controllers
         {
             this.repo = repo;
         }
+        //  SEXTA VERSION
+        public async Task<IActionResult> SessionEmpleadosV6
+            (int? idEmpleado)
+        {
+            if (idEmpleado != null)
+            {
+                //  ALMACENAREMOS LO MINIMO QUE PODAMOS
+                List<int> idsEmpleados;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") == null)
+                {
+                    //  NO EXISTE Y CREAMOS LA COLECCION
+                    idsEmpleados = new List<int>();
+                }
+                else
+                {
+                    //  EXISTE Y RECUERAMOS LA COLECCION
+                    idsEmpleados =
+                        HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                idsEmpleados.Add(idEmpleado.Value);
+                //  REFRESCAMOS LOS DATOS DE SESSION
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                ViewData["MENSAJE"] = "Empleados almacenados: " + idsEmpleados.Count();
+            }
+            List<Empleado> empleados =
+                await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+        public async Task<IActionResult> EmpleadosAlmacenadosV6
+            (int? idEmpleado)
+        {
+            List<int> idsEmpleados;
+            //  DEBEMOS RECUPERAR LOS IDS DE EMPLEADOS QUE TENGAMOS
+            //  EN SESSION
+            idsEmpleados =
+                HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados almacenados en Session";
+                return View();
+            }
+            else
+            {
+                if (idEmpleado != null)
+                {
+                    idsEmpleados.Remove(idEmpleado.Value);
+                    HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                }
+                List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
+                return View(empleados);
+            }
+            
+        }
+        //  QUINTA VERSION
+        public async Task<IActionResult> SessionEmpleadosV5
+            (int? idEmpleado)
+        {
+            if (idEmpleado != null)
+            {
+                //  ALMACENAREMOS LO MINIMO QUE PODAMOS
+                List<int> idsEmpleados;
+                if (HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS") == null)
+                {
+                    //  NO EXISTE Y CREAMOS LA COLECCION
+                    idsEmpleados = new List<int>();
+                }
+                else
+                {
+                    //  EXISTE Y RECUERAMOS LA COLECCION
+                    idsEmpleados =
+                        HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+                }
+                idsEmpleados.Add(idEmpleado.Value);
+                //  REFRESCAMOS LOS DATOS DE SESSION
+                HttpContext.Session.SetObject("IDSEMPLEADOS", idsEmpleados);
+                ViewData["MENSAJE"] = "Empleados almacenados: " + idsEmpleados.Count();
+            }
+            List<Empleado> empleados =
+                await this.repo.GetEmpleadosAsync();
+            return View(empleados);
+        }
+        public async Task<IActionResult> EmpleadosAlmacenadosV5()
+        {
+            //  DEBEMOS RECUPERAR LOS IDS DE EMPLEADOS QUE TENGAMOS
+            //  EN SESSION
+            List<int> idsEmpleados =
+                HttpContext.Session.GetObject<List<int>>("IDSEMPLEADOS");
+            if (idsEmpleados == null)
+            {
+                ViewData["MENSAJE"] = "No existen empleados almacenados en Session";
+                return View();
+            }
+            else
+            {
+                List<Empleado> empleados = await this.repo.GetEmpleadosSessionAsync(idsEmpleados);
+                return View(empleados);
+            }
+        }
         //  CUARTA VERSION
         public async Task<IActionResult> SessionEmpleadosV4
             (int? idEmpleado)
@@ -70,8 +168,6 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                 return View(empleados);
             }
         }
-
-
         //TERCERA VERSION
         public async Task<IActionResult> SessionEmpleadosOK
             (int? idEmpleado)
@@ -117,7 +213,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                 return View(empleados);
             }
         }
-        
+
         //SEGUNDA VERSION
         public async Task<IActionResult> SessionEmpleados
             (int? idEmpleado)
