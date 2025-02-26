@@ -1,22 +1,67 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using MvcNetCoreSessionEmpleados.Extensions;
 using MvcNetCoreSessionEmpleados.Models;
 using MvcNetCoreSessionEmpleados.Repositories;
+using System.CodeDom;
 
 namespace MvcNetCoreSessionEmpleados.Controllers
 {
     public class EmpleadosController : Controller
     {
-        RepositoryEmpleados repo;
-        public EmpleadosController(RepositoryEmpleados repo)
+        private RepositoryEmpleados repo;
+        private IMemoryCache MemoryCache;
+        public EmpleadosController(RepositoryEmpleados repo,
+            IMemoryCache memoryCache)
         {
             this.repo = repo;
+            this.MemoryCache = memoryCache;
+        }
+
+        public async Task<IActionResult> EmpleadosFavoritos()
+        {
+            //  PREGUNTAMOS SI EXISTEN FAVORITOS
+            if (this.MemoryCache.Get("FAVORITOS") == null)
+            {
+                ViewData["MENSAJE"] = "No existen favoritos almacenados";
+                return View();
+            }
+            else
+            {
+                List<Empleado> favoritos =
+                    this.MemoryCache.Get<List<Empleado>>("FAVORITOS");
+                return View(favoritos);
+            }
         }
         //  SEXTA VERSION
         public async Task<IActionResult> SessionEmpleadosV6
-            (int? idEmpleado)
+            (int? idEmpleado, int? idFavorito)
         {
+            if (idFavorito != null)
+            {
+                //  COMO ESTOY ALMACENANDO EN CACHE DE CLIENTE, VAMOS A 
+                //  UTILIZAR LOS OBJETOS EN LUGAR DE LOS IDS
+                //  GUARDAREMOS DENTRO DE IMEMORY CACHE TODOS LOS EMPLEADOS
+                List<Empleado> empleadosFavoritos;
+                if (this.MemoryCache.Get("FAVORITOS") == null)
+                {
+                    //  NO EXISTEN, CREAMOS LA COLECCION DE FAVORITOS
+                    empleadosFavoritos = new List<Empleado>();
+                }
+                else
+                {
+                    //  RECUPERAMOS LOS EMPLEADOS QUE TENEMOS EN LA
+                    //  COLECCION DE FAVORITOS DE CACHE
+                    empleadosFavoritos =
+                        this.MemoryCache.Get<List<Empleado>>("FAVORITOS");
+                }
+                //  BUSCAMOS EL OBJETO EMPLEADO A ALMACENAR
+                Empleado empleado = await this.repo.FindEmpleadoAsync(idFavorito.Value);
+                empleadosFavoritos.Add(empleado);
+                this.MemoryCache.Set("FAVORITOS", empleadosFavoritos);
+            }
+
             if (idEmpleado != null)
             {
                 //  ALMACENAREMOS LO MINIMO QUE PODAMOS
@@ -41,6 +86,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                 await this.repo.GetEmpleadosAsync();
             return View(empleados);
         }
+        
         public async Task<IActionResult> EmpleadosAlmacenadosV6
             (int? idEmpleado)
         {
