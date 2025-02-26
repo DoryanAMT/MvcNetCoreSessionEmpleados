@@ -2,6 +2,11 @@
 
 @{
     List<int> idsEmpleados = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+    //  NECESITAMOS SESSION PARA SABER EL DIBUJO A REALIZAR
+    List<int> ids = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+    //  NECESITAMOS MEMORYCACHE PARA LOS DIBUJOS
+    List<Empleado> favoritos =
+        memoryCache.Get<List<Empleado>>("FAVORITOS");
 }
 
 <h1 style="color:blue">Session Empleados V6</h1>
@@ -12,24 +17,39 @@
         Empleados Almacenados V6
     </a>
 </p>
+@if(favoritos != null){
+    <h3 style="background-color:lightgreen">
+        Empleados favoritos: @favoritos.Count
+    </h3>
+}
+
+@if (ids != null)
+{
+    <h3 style="background-color:blue; color: white">
+        Empleados Session: @ids.Count
+    </h3>
+}
 
 <h4>@ViewData["MENSAJE"]</h4>
 
 <ul class="list-group">
     @foreach (Empleado empleado in Model)
     {
-        <a asp-controller="Empleados"
-           asp-action="SessionEmpleadosV6"
-        asp-route-idfavorito="@empleado.IdEmpleado">Favorito</a>
+        
         @if (idsEmpleados != null && idsEmpleados.Contains(empleado.IdEmpleado))
         {
             <li class="list-group-item list-group-item-warning">
                 @empleado.Apellido -
                 <a asp-controller="Empleados"
                    asp-action="SessionEmpleadosV6"
-                   asp-route-idEmpleado="@empleado.IdEmpleado">
+                   asp-route-idEmpleado="@empleado.IdEmpleado"
+                    class="btn btn-warning">
                     Almacenar empleado ✔
                 </a>
+                <a asp-controller="Empleados"
+                   asp-action="SessionEmpleadosV6"
+                   asp-route-idfavorito="@empleado.IdEmpleado"
+                   class="btn btn-info">Favorito</a>
             </li>
         }
         else
@@ -38,10 +58,16 @@
                 @empleado.Apellido -
                 <a asp-controller="Empleados"
                    asp-action="SessionEmpleadosV6"
-                   asp-route-idEmpleado="@empleado.IdEmpleado">
+                   asp-route-idEmpleado="@empleado.IdEmpleado"
+                   class="btn btn-warning">
                     Almacenar empleado
                 </a>
+                <a asp-controller="Empleados"
+                   asp-action="SessionEmpleadosV6"
+                   asp-route-idfavorito="@empleado.IdEmpleado"
+                   class="btn btn-info">Favorito</a>
             </li>
         }
+        
     }
 </ul>
