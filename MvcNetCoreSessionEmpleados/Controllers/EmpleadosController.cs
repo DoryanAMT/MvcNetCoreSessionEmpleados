@@ -21,18 +21,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
 
         public async Task<IActionResult> EmpleadosFavoritos()
         {
-            //  PREGUNTAMOS SI EXISTEN FAVORITOS
-            if (this.MemoryCache.Get("FAVORITOS") == null)
-            {
-                ViewData["MENSAJE"] = "No existen favoritos almacenados";
-                return View();
-            }
-            else
-            {
-                List<Empleado> favoritos =
-                    this.MemoryCache.Get<List<Empleado>>("FAVORITOS");
-                return View(favoritos);
-            }
+            return View();
         }
         //  SEXTA VERSION
         public async Task<IActionResult> SessionEmpleadosV6

@@ -1,7 +1,9 @@
-﻿@model List<Empleado>
+﻿@{
+    ViewData["Title"] = "EmpleadosAlmacenados";
+}
 
 @{
-    ViewData["Title"] = "EmpleadosAlmacenados";
+    List<Empleado> favoritos = memoryCache.Get<List<Empleado>>("FAVORITOS");
 }
 
 <h1 style="color:fuchsia">Empleados Favoritos</h1>
@@ -12,11 +14,11 @@
         Volver a almacenar empleados V6
     </a>
 </p>
-<h2  style="color:red">
-    @ViewData["MENSAJE"]
-</h2>
-@if (Model != null)
-{
+@if(favoritos == null){
+    <h2 style="color:red">
+        No existen Empleados favoritos
+    </h2>
+}else{
     <table class="table table-bordered table-warning">
         <thead>
             <tr>
@@ -35,7 +37,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (Empleado item in Model)
+            @foreach (Empleado item in favoritos)
             {
                 <tr>
                     <td>
