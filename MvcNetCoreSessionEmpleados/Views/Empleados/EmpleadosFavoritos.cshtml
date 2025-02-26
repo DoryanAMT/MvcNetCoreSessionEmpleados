@@ -34,6 +34,9 @@
                 <th>
                     Departamento
                 </th>
+                <th>
+                    Acciones
+                </th>
             </tr>
         </thead>
         <tbody>
@@ -51,6 +54,13 @@
                     </td>
                     <td>
                         @item.IdDepartamento
+                    </td>
+                    <td>
+                        <a asp-controller="Empleados"
+                        asp-action="EmpleadosFavoritos"
+                        asp-route-idEliminar="@item.IdEmpleado">
+                        Delete
+                        </a>
                     </td>
                 </tr>
             }

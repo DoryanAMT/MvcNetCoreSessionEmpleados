@@ -13,11 +13,12 @@
 
 <p>
     <a asp-controller="Empleados"
-       asp-action="EmpleadosAlmacenadosV6">
+    asp-action="EmpleadosAlmacenadosV6">
         Empleados Almacenados V6
     </a>
 </p>
-@if(favoritos != null){
+@if (favoritos != null)
+{
     <h3 style="background-color:lightgreen">
         Empleados favoritos: @favoritos.Count
     </h3>
@@ -35,39 +36,55 @@
 <ul class="list-group">
     @foreach (Empleado empleado in Model)
     {
-        
-        @if (idsEmpleados != null && idsEmpleados.Contains(empleado.IdEmpleado))
-        {
-            <li class="list-group-item list-group-item-warning">
-                @empleado.Apellido -
+
+        <li class="list-group-item list-group-item-warning">
+            @empleado.Apellido -
+            @if (idsEmpleados != null && idsEmpleados.Contains(empleado.IdEmpleado))
+            {
                 <a asp-controller="Empleados"
-                   asp-action="SessionEmpleadosV6"
-                   asp-route-idEmpleado="@empleado.IdEmpleado"
-                    class="btn btn-warning">
+                asp-action="SessionEmpleadosV6"
+                asp-route-idEmpleado="@empleado.IdEmpleado"
+                class="btn btn-warning">
                     Almacenar empleado ✔
                 </a>
+            }
+            else
+            {
                 <a asp-controller="Empleados"
-                   asp-action="SessionEmpleadosV6"
-                   asp-route-idfavorito="@empleado.IdEmpleado"
-                   class="btn btn-info">Favorito</a>
-            </li>
-        }
-        else
-        {
-            <li class="list-group-item list-group-item-warning">
-                @empleado.Apellido -
-                <a asp-controller="Empleados"
-                   asp-action="SessionEmpleadosV6"
-                   asp-route-idEmpleado="@empleado.IdEmpleado"
-                   class="btn btn-warning">
+                asp-action="SessionEmpleadosV6"
+                asp-route-idEmpleado="@empleado.IdEmpleado"
+                class="btn btn-warning">
                     Almacenar empleado
                 </a>
+            }
+            @if(favoritos == null){
                 <a asp-controller="Empleados"
-                   asp-action="SessionEmpleadosV6"
-                   asp-route-idfavorito="@empleado.IdEmpleado"
-                   class="btn btn-info">Favorito</a>
-            </li>
-        }
-        
+                asp-action="SessionEmpleadosV6"
+                asp-route-idfavorito="@empleado.IdEmpleado"
+                class="btn btn-info">
+                    Favorito
+                </a>
+            }else{
+                // DEBEMOS PREGUNTAR SI EXISTE NUESTRO EMPLEADO
+                //  CON EL ID QUE ESTAMOS RECORRIENDO DENTRO DE LA COLECCION
+                Empleado empFavorito = favoritos.Find(x => x.IdEmpleado == empleado.IdEmpleado);
+                if(empFavorito != null){
+                    <a asp-controller="Empleados"
+                       asp-action="SessionEmpleadosV6"
+                       asp-route-idfavorito="@empleado.IdEmpleado"
+                       class="btn btn-info">
+                        Favorito ♥
+                    </a>
+                }else{
+                    <a asp-controller="Empleados"
+                       asp-action="SessionEmpleadosV6"
+                       asp-route-idfavorito="@empleado.IdEmpleado"
+                       class="btn btn-info">
+                        Favorito
+                    </a>
+                }
+            }
+        </li>
+
     }
 </ul>

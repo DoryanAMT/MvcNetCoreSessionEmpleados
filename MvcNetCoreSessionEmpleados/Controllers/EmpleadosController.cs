@@ -11,16 +11,34 @@ namespace MvcNetCoreSessionEmpleados.Controllers
     public class EmpleadosController : Controller
     {
         private RepositoryEmpleados repo;
-        private IMemoryCache MemoryCache;
+        private IMemoryCache memoryCache;
         public EmpleadosController(RepositoryEmpleados repo,
             IMemoryCache memoryCache)
         {
             this.repo = repo;
-            this.MemoryCache = memoryCache;
+            this.memoryCache = memoryCache;
         }
 
-        public async Task<IActionResult> EmpleadosFavoritos()
+        public async Task<IActionResult> EmpleadosFavoritos
+            (int? idEliminar)
         {
+            if (idEliminar != null)
+            {
+                List<Empleado> favoritos = this.memoryCache.Get<List<Empleado>>("FAVORITOS");
+                //  BUSCAMOS AL EMPLEADO A ELIMINAR DENTRO DE LA
+                //  COLECCION DE FAVORITOS
+                Empleado empDelete =
+                    favoritos.Find(z => z.IdEmpleado == idEliminar.Value);
+                favoritos.Remove(empDelete);
+                if (favoritos.Count == 0)
+                {
+                    this.memoryCache.Remove("FAVORITOS");
+                }
+                else
+                {
+                    this.memoryCache.Set("FAVORITOS", favoritos);
+                }
+            }
             return View();
         }
         //  SEXTA VERSION
@@ -33,7 +51,7 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                 //  UTILIZAR LOS OBJETOS EN LUGAR DE LOS IDS
                 //  GUARDAREMOS DENTRO DE IMEMORY CACHE TODOS LOS EMPLEADOS
                 List<Empleado> empleadosFavoritos;
-                if (this.MemoryCache.Get("FAVORITOS") == null)
+                if (this.memoryCache.Get("FAVORITOS") == null)
                 {
                     //  NO EXISTEN, CREAMOS LA COLECCION DE FAVORITOS
                     empleadosFavoritos = new List<Empleado>();
@@ -43,12 +61,12 @@ namespace MvcNetCoreSessionEmpleados.Controllers
                     //  RECUPERAMOS LOS EMPLEADOS QUE TENEMOS EN LA
                     //  COLECCION DE FAVORITOS DE CACHE
                     empleadosFavoritos =
-                        this.MemoryCache.Get<List<Empleado>>("FAVORITOS");
+                        this.memoryCache.Get<List<Empleado>>("FAVORITOS");
                 }
                 //  BUSCAMOS EL OBJETO EMPLEADO A ALMACENAR
                 Empleado empleado = await this.repo.FindEmpleadoAsync(idFavorito.Value);
                 empleadosFavoritos.Add(empleado);
-                this.MemoryCache.Set("FAVORITOS", empleadosFavoritos);
+                this.memoryCache.Set("FAVORITOS", empleadosFavoritos);
             }
 
             if (idEmpleado != null)

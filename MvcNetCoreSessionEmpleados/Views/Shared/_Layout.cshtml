@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@{
+    List<int> idsEmpleados = Context.Session.GetObject<List<int>>("IDSEMPLEADOS");
+    List<Empleado> favoritos = memoryCache.Get<List<Empleado>>("FAVORITOS");
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -46,6 +51,20 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Empleados" asp-action="EmpleadosFavoritos">Empleados Favoritos</a>
+                        </li>
+                        <li class="nav-item">
+                            @if (idsEmpleados != null)
+                            {
+                                <h6 style="background-color:blue;color:white">
+                                    Compras: @idsEmpleados.Count
+                                </h6>
+                            }
+                            @if (favoritos != null)
+                            {
+                                <h6 style="background-color:lightgreen">
+                                    Favoritos: @favoritos.Count
+                                </h6>
+                            }
                         </li>
                     </ul>
                 </div>
